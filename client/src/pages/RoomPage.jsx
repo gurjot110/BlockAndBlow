@@ -45,31 +45,59 @@ function RoomPageInner() {
   }
 
   return (
-    <main className="page">
-      <form className="card" onSubmit={join}>
-        <h1>Room Page</h1>
-        <p>
-          Logged in as <b>{user?.username}</b>
-        </p>
-        <input
-          placeholder="Enter room ID, e.g. room1"
-          value={roomId}
-          onChange={(e) => setRoomId(e.target.value)}
-        />
-        <div className="row">
-          <button>Join / Create Room</button>
-          <button
-            type="button"
-            className="secondary"
-            onClick={() => nav("/leaderboard")}
-          >
-            Leaderboard
-          </button>
-          <button type="button" className="danger" onClick={logout}>
-            Logout
-          </button>
-        </div>
-      </form>
+    <main className="room-page">
+      <button className="logout-btn" onClick={logout}>
+        Logout
+      </button>
+
+      <section className="room-hero">
+        <h1 className="room-title">
+          Logged in as <span>{user?.username}</span>
+        </h1>
+
+        <form className="room-content" onSubmit={join}>
+          <input
+            placeholder="Enter room ID (e.g. room1)"
+            value={roomId}
+            onChange={(e) => setRoomId(e.target.value)}
+          />
+
+          <div className="room-actions">
+            <button type="submit">Join / Create Room</button>
+
+            <button
+              type="button"
+              className="secondary room-leaderboard-btn"
+              onClick={() => nav("/leaderboard")}
+            >
+              Leaderboard
+            </button>
+          </div>
+        </form>
+
+        <section className="rules-box">
+          <h2>Moves & Rules</h2>
+
+          <p>
+            <b>Move:</b> Arrow Keys
+          </p>
+          <p>
+            <b>Attack:</b> X
+          </p>
+          <p>
+            <b>Shield:</b> Z
+          </p>
+          <p>
+            <b>Players:</b> Minimum 2, maximum 10
+          </p>
+          <p>
+            <b>Goal:</b> Survive until the end or be the last player alive
+          </p>
+          <p>
+            <b>Spacebar:</b> Dash (Only 1 per game, use wisely)
+          </p>
+        </section>
+      </section>
     </main>
   );
 }

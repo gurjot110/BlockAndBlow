@@ -69,32 +69,58 @@ function LobbyInner() {
   const isHost = room?.hostUserId === user?.id;
 
   return (
-    <main className="page">
-      <section className="card">
-        <h1>Lobby: {roomId}</h1>
+    <main className="room-page">
+      {/* Logout (top-right) */}
+      <button
+        className="logout-btn"
+        onClick={() => {
+          getSocket().emit("leaveRoom");
+          nav("/login");
+        }}
+      >
+        Logout
+      </button>
+
+      <section className="room-hero">
+        {/* Title */}
+        <h1 className="room-title">
+          <span className="label">Room ID:</span> <span>{roomId}</span>
+        </h1>
 
         {error && <div className="error">{error}</div>}
 
-        <p>Players: {players.length}/10</p>
+        {/* Players */}
+        <div className="players-box">
+          <h2>Players ({players.length}/10)</h2>
 
-        <ul className="list">
-          {players.map((p) => (
-            <li key={p.socketId}>
-              <span>{p.username}</span>
-              {p.userId === room?.hostUserId && <b>Host</b>}
-            </li>
-          ))}
-        </ul>
+          <ul className="list">
+            {players.map((p) => (
+              <li key={p.socketId}>
+                <span>{p.username}</span>
+                {p.userId === room?.hostUserId && <b>Host</b>}
+              </li>
+            ))}
+          </ul>
+        </div>
 
-        <div className="row">
+        {/* Buttons */}
+        <div className="room-actions">
           {isHost && (
             <button disabled={players.length < 2} onClick={start}>
               Start Match
             </button>
           )}
 
-          <button className="danger" onClick={leave}>
-            Return to Room Page
+          <button
+            className="logout-btn"
+            onClick={() => {
+              getSocket().emit("leaveRoom");
+              localStorage.clear();
+              nav("/login");
+              window.location.reload();
+            }}
+          >
+            Logout
           </button>
         </div>
       </section>
