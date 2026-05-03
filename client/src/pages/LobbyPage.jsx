@@ -110,18 +110,7 @@ function LobbyInner() {
               Start Match
             </button>
           )}
-
-          <button
-            className="logout-btn"
-            onClick={() => {
-              getSocket().emit("leaveRoom");
-              localStorage.clear();
-              nav("/login");
-              window.location.reload();
-            }}
-          >
-            Logout
-          </button>
+          {/*  */}
         </div>
       </section>
     </main>

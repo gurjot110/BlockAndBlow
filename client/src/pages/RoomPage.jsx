@@ -39,17 +39,8 @@ function RoomPageInner() {
     if (id) nav(`/lobby/${encodeURIComponent(id)}`);
   }
 
-  function logout() {
-    localStorage.clear();
-    nav("/login");
-  }
-
   return (
     <main className="room-page">
-      <button className="logout-btn" onClick={logout}>
-        Logout
-      </button>
-
       <section className="room-hero">
         <h1 className="room-title">
           Logged in as <span>{user?.username}</span>

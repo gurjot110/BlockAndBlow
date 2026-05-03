@@ -557,22 +557,37 @@ button:disabled {
   color: #00ff88;
 }
 
-/* logout button (top right) */
 .logout-btn {
-  padding: 10px 18px;
-  border-radius: 10px;
+  position: fixed;
+  top: 20px;
+  right: 24px;
+
+  padding: 10px 18px; /* 👈 controls size */
+  font-size: 14px; /* 👈 consistent text size */
+
+  border-radius: 12px;
   border: 1px solid #ff4d4d;
-  background: transparent;
+
+  background: rgba(0, 0, 0, 0.6);
   color: #ff4d4d;
+
+  font-weight: 700;
+  letter-spacing: 1px;
+
   cursor: pointer;
-  transition: 0.2s;
+
+  z-index: 1000;
+
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
+
+  transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
   background: #ff4d4d;
   color: white;
+  transform: scale(1.05);
 }
-
 /* center content */
 .room-content {
   display: flex;
@@ -738,4 +753,52 @@ button:disabled {
 /* host badge */
 .players-box b {
   color: #00ff88;
+}
+/* ---------- LEADERBOARD ---------- */
+
+.leaderboard-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+}
+
+.leaderboard-title {
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: 42px;
+  letter-spacing: 2px;
+  color: #00ff88;
+  text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+}
+
+.leaderboard-table {
+  width: min(900px, 95vw);
+  border-collapse: collapse;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.leaderboard-table th {
+  background: rgba(0, 255, 136, 0.1);
+  color: #00ff88;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 14px;
+  text-align: center;
+  border-bottom: 1px solid #222;
+}
+
+.leaderboard-table tr:hover {
+  background: rgba(0, 255, 136, 0.08);
+  transform: scale(1.01);
+  transition: 0.2s;
 }
