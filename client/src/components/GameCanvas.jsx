@@ -26,9 +26,15 @@ export default function GameCanvas({ gameState, socket }) {
   useEffect(() => {
     function down(e) {
       if (
-        ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "x", "z"].includes(
-          e.key,
-        )
+        [
+          "ArrowUp",
+          "ArrowDown",
+          "ArrowLeft",
+          "ArrowRight",
+          "x",
+          "z",
+          " ",
+        ].includes(e.key)
       )
         e.preventDefault();
       keys.current[e.key] = true;
@@ -46,6 +52,7 @@ export default function GameCanvas({ gameState, socket }) {
         right: !!keys.current.ArrowRight,
         attack: !!keys.current.x,
         shield: !!keys.current.z,
+        dash: !!keys.current[" "],
       });
     }
     window.addEventListener("keydown", down);
@@ -140,7 +147,7 @@ export default function GameCanvas({ gameState, socket }) {
     );
     ctx.font = "14px Arial";
     ctx.fillText(
-      "Move: Arrow Keys | Attack: X | Shield: Z",
+      "Move: Arrow Keys | Attack: X | Shield: Z | Dash: Space",
       canvas.width / 2,
       55,
     );

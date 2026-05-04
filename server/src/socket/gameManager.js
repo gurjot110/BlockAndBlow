@@ -4,6 +4,10 @@ const TICK_RATE = 60;
 const MAP_WIDTH = 2000;
 const MAP_HEIGHT = 2000;
 const MATCH_SECONDS = 300;
+const ACTION_LIMIT = 5;
+const ACTION_WINDOW_MS = 10000;
+const DASH_TICKS = 8;
+const DASH_MULTIPLIER = 3.2;
 
 function randColor() {
   return `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
@@ -227,6 +231,17 @@ export class GameManager {
         hitRegistered: false,
         kills: 0,
         input: {},
+        rawAttack: false,
+        rawShield: false,
+        rawDash: false,
+
+        attackUseTimes: [],
+        shieldUseTimes: [],
+        attackAllowed: false,
+        shieldAllowed: false,
+
+        dashUsed: false,
+        dashTicks: 0,
       };
     }
 
@@ -250,14 +265,61 @@ export class GameManager {
   setInput(socket, input) {
     const room = this.rooms.get(socket.data.roomId);
     const p = room?.game?.players?.[socket.id];
+
     if (!p || !p.alive) return;
+
+    const now = Date.now();
+
+    function canUseAction(times) {
+      while (times.length && now - times[0] > ACTION_WINDOW_MS) {
+        times.shift();
+      }
+
+      if (times.length >= ACTION_LIMIT) {
+        return false;
+      }
+
+      times.push(now);
+      return true;
+    }
+
+    const attackPressed = !!input.attack;
+    const shieldPressed = !!input.shield;
+    const dashPressed = !!input.dash;
+
+    if (attackPressed && !p.rawAttack) {
+      p.attackAllowed = canUseAction(p.attackUseTimes);
+    }
+
+    if (!attackPressed) {
+      p.attackAllowed = false;
+    }
+
+    if (shieldPressed && !p.rawShield) {
+      p.shieldAllowed = canUseAction(p.shieldUseTimes);
+    }
+
+    if (!shieldPressed) {
+      p.shieldAllowed = false;
+    }
+
+    if (dashPressed && !p.rawDash && !p.dashUsed) {
+      p.dashUsed = true;
+      p.dashTicks = DASH_TICKS;
+    }
+
+    p.rawAttack = attackPressed;
+    p.rawShield = shieldPressed;
+    p.rawDash = dashPressed;
+
     p.input = {
       up: !!input.up,
       down: !!input.down,
       left: !!input.left,
       right: !!input.right,
-      attack: !!input.attack,
-      shield: !!input.shield,
+      attack: attackPressed && p.attackAllowed,
+      shield: shieldPressed && p.shieldAllowed,
+      dash: dashPressed,
     };
   }
 
@@ -297,13 +359,39 @@ export class GameManager {
     if (p.stuckTimer > 0) p.stuckTimer--;
     if (p.spawnProtection > 0) p.spawnProtection--;
 
-    const oldX = p.x,
-      oldY = p.y;
-    if (p.stuckTimer <= 0) {
-      p.x += dx * p.speed;
-      p.y += dy * p.speed;
+    // const oldX = p.x,
+    //   oldY = p.y;
+    // if (p.stuckTimer <= 0) {
+    //   p.x += dx * p.speed;
+    //   p.y += dy * p.speed;
+    // }
+    // if (dx !== 0 || dy !== 0) p.direction = Math.atan2(dy, dx);
+
+    const oldX = p.x;
+    const oldY = p.y;
+
+    if (dx !== 0 || dy !== 0) {
+      p.direction = Math.atan2(dy, dx);
     }
-    if (dx !== 0 || dy !== 0) p.direction = Math.atan2(dy, dx);
+
+    if (p.stuckTimer <= 0) {
+      if (p.dashTicks > 0) {
+        let dashDx = dx;
+        let dashDy = dy;
+
+        if (dashDx === 0 && dashDy === 0) {
+          dashDx = Math.cos(p.direction);
+          dashDy = Math.sin(p.direction);
+        }
+
+        p.x += dashDx * p.speed * DASH_MULTIPLIER;
+        p.y += dashDy * p.speed * DASH_MULTIPLIER;
+        p.dashTicks--;
+      } else {
+        p.x += dx * p.speed;
+        p.y += dy * p.speed;
+      }
+    }
 
     p.attacking = p.input.attack && !p.input.shield;
     p.shielding = p.input.shield && !p.input.attack;
