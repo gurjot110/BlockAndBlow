@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 
-export default function GameCanvas({ gameState, socket }) {
+export default function GameCanvas({ gameState, socket, spectating = false }) {
   const canvasRef = useRef(null);
   const stateRef = useRef(null);
+  const spectatingRef = useRef(false);
   const myId = useRef(null);
   const camera = useRef({ x: 0, y: 0, frozen: false });
   const keys = useRef({});
@@ -12,6 +13,10 @@ export default function GameCanvas({ gameState, socket }) {
   useEffect(() => {
     stateRef.current = gameState;
   }, [gameState]);
+
+  useEffect(() => {
+    spectatingRef.current = spectating;
+  }, [spectating]);
 
   useEffect(() => {
     if (!socket) return;
@@ -45,6 +50,7 @@ export default function GameCanvas({ gameState, socket }) {
       emitInput();
     }
     function emitInput() {
+      if (spectatingRef.current) return;
       socket?.emit("playerInput", {
         up: !!keys.current.ArrowUp,
         down: !!keys.current.ArrowDown,
@@ -100,12 +106,21 @@ export default function GameCanvas({ gameState, socket }) {
     }
 
     const me = state.players?.[myId.current];
-    if (me && me.alive) {
+    if (spectatingRef.current) {
+      const camSpeed = 9;
+
+      if (keys.current.ArrowUp) camera.current.y -= camSpeed;
+      if (keys.current.ArrowDown) camera.current.y += camSpeed;
+      if (keys.current.ArrowLeft) camera.current.x -= camSpeed;
+      if (keys.current.ArrowRight) camera.current.x += camSpeed;
+    } else if (me && me.alive) {
       camera.current.x = me.x - canvas.width / 2;
       camera.current.y = me.y - canvas.height / 2;
     } else if (me && !camera.current.frozen) {
-      camera.current.x = me.deathX || me.x || camera.current.x;
-      camera.current.y = me.deathY || me.y || camera.current.y;
+      camera.current.x =
+        (me.deathX || me.x || camera.current.x) - canvas.width / 2;
+      camera.current.y =
+        (me.deathY || me.y || camera.current.y) - canvas.height / 2;
       camera.current.frozen = true;
     }
     camera.current.x = Math.max(

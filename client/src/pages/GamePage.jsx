@@ -18,6 +18,7 @@ function GameInner() {
   const [state, setState] = useState(null);
   const [result, setResult] = useState(null);
   const [dead, setDead] = useState(false);
+  const [spectating, setSpectating] = useState(false);
 
   useEffect(() => {
     const socket = getSocket();
@@ -25,7 +26,6 @@ function GameInner() {
     socket.on("matchStarted", setState);
     socket.on("youDied", () => {
       setDead(true);
-      setTimeout(() => setDead(false), 3000);
     });
     socket.on("matchEnded", setResult);
     socket.emit("joinRoom", { roomId }, () => {});
@@ -39,11 +39,43 @@ function GameInner() {
 
   return (
     <div className="game-shell">
-      <GameCanvas gameState={state} socket={getSocket()} />
-      {dead && (
+      <GameCanvas
+        gameState={state}
+        socket={getSocket()}
+        spectating={spectating}
+      />
+      {/* {dead && (
         <div className="overlay">
           <div className="overlay-card">
             <h1>You died</h1>
+          </div>
+        </div>
+      )} */}
+      {dead && (
+        <div className="overlay">
+          <div className="overlay-card death-card">
+            <h1>You died</h1>
+
+            <div className="row">
+              <button
+                onClick={() => {
+                  setDead(false);
+                  setSpectating(true);
+                }}
+              >
+                Spectate
+              </button>
+
+              <button
+                className="danger"
+                onClick={() => {
+                  getSocket().emit("leaveRoom");
+                  nav("/rooms");
+                }}
+              >
+                Log Out
+              </button>
+            </div>
           </div>
         </div>
       )}

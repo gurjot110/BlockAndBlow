@@ -477,6 +477,7 @@ export class GameManager {
             if (target.health <= 0) {
               attacker.kills += 1;
               this.killPlayerByState(game, target.socketId);
+              this.io.to(target.socketId).emit("youDied");
             }
           }
           attacker.hitRegistered = true;
