@@ -1,6 +1,6 @@
 import User from "../models/User.js";
 
-const TICK_RATE = 60;
+const TICK_RATE = 30;
 const MAP_WIDTH = 2000;
 const MAP_HEIGHT = 2000;
 const MATCH_SECONDS = 300;

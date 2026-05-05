@@ -63,7 +63,7 @@ export default function GameCanvas({ gameState, socket, spectating = false }) {
     }
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
-    const interval = setInterval(emitInput, 50);
+    const interval = setInterval(emitInput, 25);
     return () => {
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
