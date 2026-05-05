@@ -35,7 +35,7 @@ const io = new Server(server, {
 
 io.use(authSocket);
 registerSocketHandlers(io);
-
+console.log("CLIENT_URL:", CLIENT_URL);
 connectDB().then(() => {
   server.listen(PORT, () => console.log(`Server running on ${PORT}`));
 });
